@@ -10,6 +10,8 @@
       "lang-utils":"^0.0.2",
       "file-plus":"^0.0.2"
   },
-  "author": "",
+  "repository": "lemonabc/astros-js-tpl",
+  "email" : "ilemonabc@qq.com",
+  "author": "lemonabc <ilemonabc@qq.com>",
   "license": "ISC"
 }
