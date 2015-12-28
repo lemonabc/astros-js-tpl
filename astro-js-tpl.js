@@ -14,7 +14,7 @@ module.exports = new astro.Middleware({
 }, function(asset, next) {
     if(!asset.prjCfg.jsTpl){
         console.error("astro-js-tpl", 
-            '请在项目配置中设置jsTpl，如："$addRes(\'{name}\',\'{file}\',\'{content}\')"')
+            '请在项目配置中设置jsTpl，如："$addRes({name},{file},{content})"')
         next(asset);
         return;
     }
@@ -25,20 +25,26 @@ module.exports = new astro.Middleware({
         project = asset.project,
         tpls = '';
     jsLibs.forEach(function(cpt) {
-        var filePath = path.join(asset.prjCfg.jsCom,cpt);
-        var fileList = file.getAllFilesSync(filePath,['.'+asset.prjCfg.htmlExt]);
+        var filePath = path.join(asset.prjCfg.jsCom, cpt);
+        if(!fs.existsSync(filePath)){
+            return;
+        }
+        var fileList = file.getAllFilesSync(filePath, 
+                ['.'+asset.prjCfg.htmlExt]);
         fileList.forEach(function(file){
             var content = fs.readFileSync(file,'utf-8');
-            content = content.trim();
-            content = content.replace(/\s*\n\s*/g,'');
-            content = JSON.stringify(content);
-            if(content != ''){
+            if(content){
+                content = content.trim();
+                content = content.replace(/\s*\n\s*/g,'');
+                content = JSON.stringify(content)
+                            .replace(/^['"]|['"]$/g,'')
+                            .replace(/'/g,'\\\'');
                 var fileName = path.basename(file,'.'+asset.prjCfg.htmlExt);
                 //var com = `$res.${js}.${fileName}=${content};\n`;
 
-                tpls = asset.prjCfg.jsTpl.replace('{name}', cpt)
-                        .replace('{file}', fileName)
-                        .replace('{content}', content)+'\n' + tpls;
+                tpls = asset.prjCfg.jsTpl.replace(/\{name\}/g, cpt)
+                        .replace(/\{file\}/g, fileName)
+                        .replace(/\{content\}/g, content)+'\n' + tpls;
             }
         })
             
