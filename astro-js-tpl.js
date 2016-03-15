@@ -12,9 +12,10 @@ module.exports = new astro.Middleware({
     modType: 'page',
     fileType: 'js'
 }, function(asset, next) {
-    if(!asset.prjCfg.jsTpl){
+    var js_tpl = asset.prjCfg.jsTpl || this.config.tpl;
+    if(!js_tpl){
         console.error("astro-js-tpl", 
-            '请在项目配置中设置jsTpl，如："$addRes({name},{file},{content})"')
+            '请在项目配置中设置，如："$addRes({name},{file},{content})"')
         next(asset);
         return;
     }
@@ -42,7 +43,7 @@ module.exports = new astro.Middleware({
                 var fileName = path.basename(file,'.'+asset.prjCfg.htmlExt);
                 //var com = `$res.${js}.${fileName}=${content};\n`;
 
-                tpls = asset.prjCfg.jsTpl.replace(/\{name\}/g, cpt)
+                tpls = js_tpl.replace(/\{name\}/g, cpt)
                         .replace(/\{file\}/g, fileName)
                         .replace(/\{content\}/g, content)+'\n' + tpls;
             }
