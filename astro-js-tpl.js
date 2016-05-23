@@ -21,11 +21,13 @@ module.exports = new astro.Middleware({
     }
     if(!asset.jsLibs.length){
         next(asset);
+        return;
     }
     let jsLibs = asset.jsLibs[1],
         project = asset.project,
         tpls = '';
     jsLibs.forEach(function(cpt) {
+
         var filePath = path.join(asset.prjCfg.jsCom, cpt);
         if(!fs.existsSync(filePath)){
             return;
