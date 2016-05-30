@@ -1,3 +1,5 @@
+这是一个Astros中间件
+
 传统方案中，JS渲染HTML，是通过字符串拼接的形式，JS和HTML代码混合在一起，维护起来很不方便。`astros-js-tpl`提供了另一种解决方案。可以用在JS中引用HTML文件，方便维护和开发。
 
 `astros-js-tpl`会把依赖的JS组件的HTML合并到JS组件的JS之前。
