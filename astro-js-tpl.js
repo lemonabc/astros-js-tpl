@@ -13,45 +13,61 @@ module.exports = new astro.Middleware({
     fileType: 'js'
 }, function(asset, next) {
     var js_tpl = asset.prjCfg.jsTpl || this.config.tpl;
-    if(!js_tpl){
-        console.error("astro-js-tpl", 
+    if (!js_tpl) {
+        console.error("astro-js-tpl",
             '请在项目配置中设置，如："$addRes({name},{file},{content})"')
         next(asset);
         return;
     }
-    if(!asset.jsLibs.length){
+    if (!asset.jsLibs.length) {
         next(asset);
         return;
     }
     let jsLibs = asset.jsLibs[1],
         project = asset.project,
-        tpls = '';
-    jsLibs.forEach(function(cpt) {
+        tpls = '',
+        jslib_assets = [];
 
+    jsLibs.forEach(function(cpt) {
         var filePath = path.join(asset.prjCfg.jsCom, cpt);
-        if(!fs.existsSync(filePath)){
+        if (!fs.existsSync(filePath)) {
             return;
         }
-        var fileList = file.getAllFilesSync(filePath, 
-                ['.'+asset.prjCfg.htmlExt]);
-        fileList.forEach(function(file){
-            var content = fs.readFileSync(file,'utf-8');
-            if(content){
+        var fileList = file.getAllFilesSync(filePath, ['.' + asset.prjCfg.htmlExt]);
+        fileList.forEach(function(file) {
+            var content = fs.readFileSync(file, 'utf-8');
+
+            var a = new astro.Asset({
+                modType: 'jsCom',
+                name: cpt,
+                fileType: 'html',
+            });
+            a.path = file;
+            jslib_assets.push(a)
+        });
+    });
+
+    astro.Asset.getContents(jslib_assets, function(asts) {
+        asts.forEach(function(a) {
+            var content = a.data;
+            if (content) {
                 content = content.trim();
-                content = content.replace(/\s*\n\s*/g,'');
+                content = content.replace(/\s*\n\s*/g, '');
                 content = JSON.stringify(content)
-                            .replace(/^['"]|['"]$/g,'')
-                            .replace(/'/g,'\\\'');
-                var fileName = path.basename(file,'.'+asset.prjCfg.htmlExt);
+                    .replace(/^['"]|['"]$/g, '')
+                    .replace(/'/g, '\\\'');
+                var fileName = path.basename(a.filePath, '.' + asset.prjCfg.htmlExt);
                 //var com = `$res.${js}.${fileName}=${content};\n`;
 
-                tpls = js_tpl.replace(/\{name\}/g, cpt)
-                        .replace(/\{file\}/g, fileName)
-                        .replace(/\{content\}/g, content)+'\n' + tpls;
+                tpls = js_tpl.replace(/\{name\}/g, a.name)
+                    .replace(/\{file\}/g, fileName)
+                    .replace(/\{content\}/g, content) + '\n' + tpls;
             }
-        })
-            
-    });
+        });
+
     asset.data = tpls + asset.data;
     next(asset);
+
+    })
+
 });
