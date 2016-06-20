@@ -15,7 +15,7 @@ module.exports = new astro.Middleware({
     var js_tpl = asset.prjCfg.jsTpl || this.config.tpl;
     if (!js_tpl) {
         console.error("astro-js-tpl",
-            '请在项目配置中设置，如："$addRes({name},{file},{content})"')
+            '请在项目配置中设置模板格式，如："$tpl({name},{file},{content})"，具体请参看 https://github.com/lemonabc/astros-js-tpl');
         next(asset);
         return;
     }
