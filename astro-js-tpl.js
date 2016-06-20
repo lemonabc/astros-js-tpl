@@ -19,7 +19,7 @@ module.exports = new astro.Middleware({
         next(asset);
         return;
     }
-    if (!asset.jsLibs.length) {
+    if (!asset.jsLibs || !asset.jsLibs[1].length) {
         next(asset);
         return;
     }
