@@ -48,7 +48,7 @@ HTML路径：root/assets/jslib/dialog/dialog.html
 
 **引用方式**
 
-在页面中通过$tpl直接引用
+在JS中通过$tpl直接引用
 
 ```
 console.log($tpl('dialog/dialog'));
